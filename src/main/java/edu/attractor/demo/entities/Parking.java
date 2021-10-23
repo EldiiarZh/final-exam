@@ -13,8 +13,10 @@ import javax.persistence.Table;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table
+@Table (name = "parkings")
 public class Parking extends BaseEntity {
+
     private Integer number;
+
     private State state;
 }
