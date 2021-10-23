@@ -7,6 +7,7 @@ import edu.attractor.demo.services.ActionService;
 import edu.attractor.demo.services.PlaceService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
