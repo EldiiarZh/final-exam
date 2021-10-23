@@ -10,32 +10,32 @@ import edu.attractor.demo.repositories.PlaceRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
+@RequiredArgsConstructor
 public class ActionService {
 
-    private PlaceRepository placeRepository;
-    private ActionRepository actionRepository;
+    private final PlaceRepository placeRepository;
+    private final ActionRepository actionRepository;
     private final String uploadPath = "upload/photo";
 
    public void addActionIN(Integer numberOfCar,  MultipartFile multipartFile){
-       Place place = placeRepository.findByState(State.FREE).orElseThrow(NotFoundException::new);
+       Place place = placeRepository.findFirstByState(State.FREE).orElseThrow(NotFoundException::new);
        ActionParking actionParking = new ActionParking();
        actionParking.setTime(LocalDateTime.now());
        actionParking.setNumberOfCar(numberOfCar);
-       actionParking.setImagePath(uploadFile(uploadPath,multipartFile));
+       actionParking.setImagePath(uploadFile(multipartFile));
        actionParking.setActionType(ActionType.IN);
-       actionParking.setPlace(place);
+       actionParking.setPlace(place.getId());
        place.setState(State.BUSY);
        place.setNumberCar(numberOfCar);
        placeRepository.save(place);
@@ -47,27 +47,25 @@ public class ActionService {
         actionParking.setTime(LocalDateTime.now());
         actionParking.setNumberOfCar(numberOfCar);
         actionParking.setActionType(ActionType.OUT);
-        actionParking.setImagePath(uploadFile(uploadPath,multipartFile));
-        actionParking.setPlace(place);
+        actionParking.setImagePath(uploadFile(multipartFile));
+        actionParking.setPlace(place.getId());
         place.setState(State.FREE);
         place.setNumberCar(0);
         placeRepository.save(place);
         actionRepository.save(actionParking);
     }
 
-
-
-    public String uploadFile(String uploadPath, MultipartFile file)  {
+    public String uploadFile( MultipartFile file)  {
         String filepath = "";
         if (file != null && !file.getOriginalFilename().isEmpty()) {
-            File uploadDir = new File(uploadPath).getAbsoluteFile();
+            File uploadDir = new File("C:/Users/Acer/Desktop/demo/demo/upload/photo").getAbsoluteFile();
             if (!uploadDir.exists()) {
                 uploadDir.mkdir();
             }
             String uuidFile = UUID.randomUUID().toString();
             String resultFilename = uuidFile + "." + file.getOriginalFilename();
             try {
-                file.transferTo(new File(uploadPath + "/" + resultFilename).getAbsoluteFile());
+                file.transferTo(new File("C:/Users/Acer/Desktop/demo/demo/upload/photo" + "/" + resultFilename).getAbsoluteFile());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -78,5 +76,11 @@ public class ActionService {
 
     public ActionParking getById(Long id) {
       return actionRepository.findById(id).orElseThrow(NotFoundException::new);
+    }
+
+
+    public List<ActionParking> getByParkingId(Long id){
+        Place place = placeRepository.findById(id).orElseThrow(NotFoundException::new);
+        return actionRepository.findByPlace(place.getId());
     }
 }

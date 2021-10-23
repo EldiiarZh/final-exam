@@ -20,8 +20,7 @@ public class ActionParking extends BaseEntity {
 
     private Integer numberOfCar;
 
-    @OneToOne
-    private Place place;
+    private Long place;
 
     private String imagePath;
 

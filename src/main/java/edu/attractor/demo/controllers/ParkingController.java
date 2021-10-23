@@ -40,17 +40,18 @@ public class ParkingController {
          return "main/main";
      }
 
-     @GetMapping("/parkingIn")
-    public String getFormOfParking (){
-        return null;
+     @GetMapping("/parkingIn/{id}")
+    public String getFormOfParking (@PathVariable Long id,Model model){
+        model.addAttribute("id",id);
+        return "main/add";
      }
 
-     @PostMapping("/parkingIn")
-    public String makeParking(@RequestParam MultipartFile multipartFile, @RequestParam Integer action, @RequestParam Integer numberOfCar,@RequestParam Long id){
-        if(action==1){
+     @PostMapping("/parkingIn/{id}")
+    public String makeParking(@RequestParam MultipartFile multipartFile, @RequestParam String action, @RequestParam Integer numberOfCar,@PathVariable Long id){
+        if(action.equals("1")){
             actionService.addActionIN(numberOfCar,multipartFile);
         }
-        if (action==0){
+        if (action.equals("0")){
             actionService.addActionOut(numberOfCar,multipartFile,id);
         }
         return"redirect:/parking";
@@ -58,9 +59,10 @@ public class ParkingController {
 
      @GetMapping("/displayParkingSpace/{id}")
      public String displayDetails(@PathVariable Long id,Model model){
-         ActionParking action= actionService.getById(id);
-         model.addAttribute("space",action);
-         return "spacePage";
+        List<ActionParking> list = actionService.getByParkingId(id);
+        model.addAttribute("num",id);
+         model.addAttribute("spaceHistory",list);
+         return "main/spacePage";
      }
 
 }

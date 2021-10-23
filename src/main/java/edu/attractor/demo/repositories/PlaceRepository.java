@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface PlaceRepository extends JpaRepository<Place,Long> {
-  Optional<Place>  findByState(State state);
+  Optional<Place>findFirstByState(State state);
   Optional<Place> findById(Long id);
   List<Place>findAll();
 }
